@@ -1,0 +1,10 @@
+VERSION 0.8
+
+SETUP:
+    FUNCTION
+    RUN micromamba install -n base -c conda-forge -y code-server ipykernel ipywidgets
+    RUN micromamba -n base run code-server \
+        --install-extension ms-toolsai.jupyter \
+        --install-extension equinusocio.vsc-material-theme \
+        --install-extension equinusocio.vsc-material-theme-icons \
+        --install-extension ms-python.python

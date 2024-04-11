@@ -1,0 +1,9 @@
+VERSION 0.8
+
+SETUP:
+    FUNCTION
+    RUN micromamba install -n base -c pytorch -c nvidia -c conda-forge -y \
+    python pytorch torchvision torchaudio pytorch-cuda=11.8 \
+    lightning torchinfo tensorboard tensorboardx \
+    transformers diffusers datasets accelerate evaluate optimum \
+    matplotlib seaborn plotly \
