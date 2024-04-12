@@ -3,3 +3,4 @@ VERSION 0.8
 SETUP:
     FUNCTION
     RUN micromamba install -n base -c conda-forge -y jupyterlab ipykernel ipywidgets
+    CMD ["jupyter", "lab"]

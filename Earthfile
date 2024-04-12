@@ -11,8 +11,12 @@ ARG --required --global VERSION
 common:
   FROM mambaorg/micromamba:1.5.8
   RUN micromamba install -n base -c conda-forge  -y htop nvtop
+  WORKDIR /workspace
 
 all:
+  BUILD +all-python
+
+all-python:
   BUILD +python-jupyter
   BUILD +python-code
 
