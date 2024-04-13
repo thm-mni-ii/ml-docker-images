@@ -2,5 +2,5 @@ VERSION 0.8
 
 SETUP:
     FUNCTION
-    RUN micromamba install -n base -c conda-forge -y jupyterlab ipykernel ipywidgets
+    RUN micromamba install -n base -c conda-forge -y jupyterlab jupyterhub-singleuser ipykernel ipywidgets
     CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888"]
