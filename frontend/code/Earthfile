@@ -8,4 +8,4 @@ SETUP:
         --install-extension equinusocio.vsc-material-theme \
         --install-extension equinusocio.vsc-material-theme-icons \
         --install-extension ms-python.python
-    CMD ["code-server", "--bind-addr=0.0.0.0:8080", "."]
+    CMD ["code-server", "--bind-addr=0.0.0.0:8888", "."]
