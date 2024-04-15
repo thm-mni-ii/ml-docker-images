@@ -11,26 +11,48 @@ ARG --required --global VERSION
 common:
   FROM mambaorg/micromamba:1.5.8
   ENV SHELL=/bin/bash
-  RUN micromamba install -n base -c conda-forge  -y htop nvtop
+  RUN micromamba install -n base -c conda-forge -y htop nvtop
   WORKDIR /workspace
 
 all:
   BUILD +all-python
 
 all-python:
-  BUILD +python-jupyter
-  BUILD +python-code
+  BUILD all-python-cpu
+  BUILD all-python-cuda
 
-python:
+all-python-cpu:
+  BUILD +python-cpu-jupyter
+  BUILD +python-cpu-code
+
+all-python-cuda:
+  BUILD +python-cuda-jupyter
+  BUILD +python-cuda-code
+
+python-cpu:
   FROM +common
-  DO python+SETUP
+  DO python+SETUP_CPU
 
-python-jupyter:
-  FROM +python
+python-cpu-jupyter:
+  FROM +python-cpu
   DO jupyter+SETUP
   SAVE IMAGE --push $REGISTRY/python-jupyter:$VERSION
 
-python-code:
-  FROM +python
+python-cpu-code:
+  FROM +python-cpu
   DO code+SETUP
   SAVE IMAGE --push $REGISTRY/python-code:$VERSION
+
+python-cuda:
+  FROM +common
+  DO python+SETUP_CUDA
+
+python-cuda-jupyter:
+  FROM +python-cuda
+  DO jupyter+SETUP
+  SAVE IMAGE --push $REGISTRY/python-cuda-jupyter:$VERSION
+
+python-cuda-code:
+  FROM +python-cuda
+  DO code+SETUP
+  SAVE IMAGE --push $REGISTRY/python-cuda-code:$VERSION

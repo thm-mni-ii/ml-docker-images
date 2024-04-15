@@ -2,11 +2,21 @@ VERSION 0.8
 
 SETUP:
     FUNCTION
-    RUN micromamba install -n base -c pytorch -c nvidia -c conda-forge -y \
-    python pytorch torchvision torchaudio pytorch-cuda=11.8 \
+    ARG COMPUTE_SPECIFIC_CHANNELS
+    ARG COMPUTE_SPECIFIC_PACKAGES
+    RUN micromamba install -n base -c pytorch -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y \
+    python pytorch torchvision torchaudio $COMPUTE_SPECIFIC_PACKAGES \
     lightning torchinfo tensorboard tensorboardx \
     transformers diffusers datasets accelerate evaluate optimum \
     numpy pillow \
     pandas polars duckdb python-duckdb \
     matplotlib seaborn plotly \
     gradio streamlit
+
+SETUP_CPU:
+    FUNCTION
+    DO +SETUP --COMPUTE_SPECIFIC_PACKAGES="cpuonly"
+
+SETUP_CUDA:
+    FUNCTION
+    DO +SETUP --COMPUTE_SPECIFIC_CHANNELS="-c nvidia" --COMPUTE_SPECIFIC_PACKAGES="pytorch-cuda=12.1"

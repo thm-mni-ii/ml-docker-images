@@ -2,10 +2,11 @@ VERSION 0.8
 
 SETUP:
     FUNCTION
-    RUN micromamba install -n base -c conda-forge -y code-server ipykernel ipywidgets
+    RUN micromamba install -n base -c conda-forge -y code-server jupyterhub-singleuser jupyter-server-proxy ipykernel ipywidgets
     RUN micromamba -n base run code-server \
         --install-extension ms-toolsai.jupyter \
         --install-extension equinusocio.vsc-material-theme \
         --install-extension equinusocio.vsc-material-theme-icons \
         --install-extension ms-python.python
-    CMD ["code-server", "--bind-addr=0.0.0.0:8888", "."]
+    COPY frontend/code/jupyter_server_config.py /etc/jupyter/jupyter_server_config.py
+    CMD ["jupyter", "server", "--ip=0.0.0.0", "--port=8888"]
