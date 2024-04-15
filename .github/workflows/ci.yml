@@ -3,7 +3,7 @@ name: Earthly +all
 on:
   push:
     branches: [ main ]
-    tags: [ v** ]
+    tags: [ '*' ]
   pull_request:
     branches: [ main ]
 
