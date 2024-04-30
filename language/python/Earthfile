@@ -11,7 +11,8 @@ SETUP:
     numpy pillow \
     pandas polars duckdb python-duckdb \
     matplotlib seaborn plotly \
-    gradio streamlit
+    gradio streamlit \
+    d2l beautifulsoup4 langdetect spacy mastodon.py
 
 SETUP_CPU:
     FUNCTION
