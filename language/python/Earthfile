@@ -8,6 +8,7 @@ SETUP:
     python pytorch torchvision torchaudio $COMPUTE_SPECIFIC_PACKAGES \
     lightning torchinfo tensorboard tensorboardx \
     transformers diffusers datasets accelerate evaluate optimum \
+    sentence-transformers \
     numpy pillow \
     pandas polars duckdb python-duckdb \
     matplotlib seaborn plotly \
