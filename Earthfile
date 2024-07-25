@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ./language/python AS python
-IMPORT ./language/julia AS julia
+IMPORT ./language/r AS r
 IMPORT ./frontend/jupyter AS jupyter
 IMPORT ./frontend/code AS code
 
@@ -21,6 +21,9 @@ all-python:
   BUILD all-python-cpu
   BUILD all-python-cuda
 
+all-r:
+  BUILD all-r-cpu
+
 all-python-cpu:
   BUILD +python-cpu-jupyter
   BUILD +python-cpu-code
@@ -28,6 +31,9 @@ all-python-cpu:
 all-python-cuda:
   BUILD +python-cuda-jupyter
   BUILD +python-cuda-code
+
+all-r-cpu:
+  BUILD r-cpu-jupyter
 
 python-cpu:
   FROM +common
@@ -56,3 +62,13 @@ python-cuda-code:
   FROM +python-cuda
   DO code+SETUP
   SAVE IMAGE --push $REGISTRY/python-cuda-code:$VERSION
+
+r-cpu:
+  FROM +common
+  DO r+SETUP_CPU
+
+r-cpu-jupyter:
+  FROM +r-cpu
+  DO jupyter+SETUP
+  DO r+JUPYTER_POST_INSTALL
+  SAVE IMAGE --push $REGISTRY/r-jupyter:$VERSION

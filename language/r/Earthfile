@@ -1,0 +1,15 @@
+VERSION 0.8
+
+SETUP:
+    FUNCTION
+    ARG COMPUTE_SPECIFIC_CHANNELS
+    ARG COMPUTE_SPECIFIC_PACKAGES
+    RUN micromamba install -n base -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y r-base r-tidyverse r-irkernel  $COMPUTE_SPECIFIC_PACKAGES
+
+SETUP_CPU:
+    FUNCTION
+    DO +SETUP
+
+JUPYTER_POST_INSTALL:
+    FUNCTION
+    RUN echo "IRkernel::installspec()" | micromamba -n base run R --no-save 
