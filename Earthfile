@@ -21,14 +21,14 @@ all:
   BUILD +all-rust
 
 all-python:
-  BUILD all-python-cpu
-  BUILD all-python-cuda
+  BUILD +all-python-cpu
+  BUILD +all-python-cuda
 
 all-r:
-  BUILD all-r-cpu
+  BUILD +all-r-cpu
 
 all-rust:
-  BUILD all-rust-cpu
+  BUILD +all-rust-cpu
 
 all-python-cpu:
   BUILD +python-cpu-jupyter
@@ -39,10 +39,10 @@ all-python-cuda:
   BUILD +python-cuda-code
 
 all-r-cpu:
-  BUILD r-cpu-jupyter
+  BUILD +r-cpu-jupyter
 
 all-rust-cpu:
-  BUILD rust-cpu-jupyter
+  BUILD +rust-cpu-jupyter
 
 python-cpu:
   FROM +common
