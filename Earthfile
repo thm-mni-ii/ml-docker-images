@@ -2,6 +2,7 @@ VERSION 0.8
 
 IMPORT ./language/python AS python
 IMPORT ./language/r AS r
+IMPORT ./language/rust AS rust
 IMPORT ./frontend/jupyter AS jupyter
 IMPORT ./frontend/code AS code
 
@@ -16,6 +17,8 @@ common:
 
 all:
   BUILD +all-python
+  BUILD +all-r
+  BUILD +all-rust
 
 all-python:
   BUILD all-python-cpu
@@ -23,6 +26,9 @@ all-python:
 
 all-r:
   BUILD all-r-cpu
+
+all-rust:
+  BUILD all-rust-cpu
 
 all-python-cpu:
   BUILD +python-cpu-jupyter
@@ -34,6 +40,9 @@ all-python-cuda:
 
 all-r-cpu:
   BUILD r-cpu-jupyter
+
+all-rust-cpu:
+  BUILD rust-cpu-jupyter
 
 python-cpu:
   FROM +common
@@ -72,3 +81,13 @@ r-cpu-jupyter:
   DO jupyter+SETUP
   DO r+JUPYTER_POST_INSTALL
   SAVE IMAGE --push $REGISTRY/r-jupyter:$VERSION
+
+rust-cpu:
+  FROM +common
+  DO rust+SETUP_CPU
+
+rust-cpu-jupyter:
+  FROM +rust-cpu
+  DO jupyter+SETUP
+  DO rust+JUPYTER_POST_INSTALL
+  SAVE IMAGE --push $REGISTRY/rust-jupyter:$VERSION

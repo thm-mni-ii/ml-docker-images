@@ -1,0 +1,18 @@
+VERSION 0.8
+
+SETUP:
+    FUNCTION
+    ARG COMPUTE_SPECIFIC_CHANNELS
+    ARG COMPUTE_SPECIFIC_PACKAGES
+    RUN micromamba install -n base -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y rust gcc_linux-64 gxx_linux-64 make cmake binutils_linux-64 git   $COMPUTE_SPECIFIC_PACKAGES
+    ENV PATH=$PATH:$HOME/.cargo/bin
+    RUN micromamba -n base run cargo install --locked evcxr_jupyter
+
+
+SETUP_CPU:
+    FUNCTION
+    DO +SETUP
+
+JUPYTER_POST_INSTALL:
+    FUNCTION
+    RUN evcxr_jupyter --install
