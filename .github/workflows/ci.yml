@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [all-python-cpu, all-python-cuda, all-r-cpu, all-rust-cpu]
+        image: [all-python-cpu, all-python-cuda, all-r, all-rust]
     env:
       FORCE_COLOR: 1
     steps:

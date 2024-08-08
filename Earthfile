@@ -15,34 +15,32 @@ common:
   RUN micromamba install -n base -c conda-forge -y htop nvtop curl wget unzip
   WORKDIR /workspace
 
+build:
+  ARG language
+  ARG frontend
+  BUILD +$language-$frontend
+
+build-all-frontends:
+  ARG language
+  BUILD +build --language=$language --frontend=jupyter #--frontend=code
+
 all:
-  BUILD +all-python
-  BUILD +all-r
-  BUILD +all-rust
+  BUILD +build-all-frontends --language=python-cpu --language=python-cuda --language=rust --language=r
 
 all-python:
-  BUILD +all-python-cpu
-  BUILD +all-python-cuda
+  BUILD +build-all-frontends --language=python-cpu --language=python-cuda
 
 all-r:
-  BUILD +all-r-cpu
+  BUILD +build-all-frontends --language=r
 
 all-rust:
-  BUILD +all-rust-cpu
+  BUILD +build-all-frontends --language=rust
 
 all-python-cpu:
-  BUILD +python-cpu-jupyter
-  BUILD +python-cpu-code
+  BUILD +build-all-frontends --language=python-cpu
 
 all-python-cuda:
-  BUILD +python-cuda-jupyter
-  BUILD +python-cuda-code
-
-all-r-cpu:
-  BUILD +r-cpu-jupyter
-
-all-rust-cpu:
-  BUILD +rust-cpu-jupyter
+  BUILD +build-all-frontends --language=python-cuda
 
 python-cpu:
   FROM +common
@@ -72,22 +70,22 @@ python-cuda-code:
   DO code+SETUP
   SAVE IMAGE --push $REGISTRY/python-cuda-code:$VERSION
 
-r-cpu:
+r:
   FROM +common
   DO r+SETUP_CPU
 
-r-cpu-jupyter:
-  FROM +r-cpu
+r-jupyter:
+  FROM +r
   DO jupyter+SETUP
   DO r+JUPYTER_POST_INSTALL
   SAVE IMAGE --push $REGISTRY/r-jupyter:$VERSION
 
-rust-cpu:
+rust:
   FROM +common
   DO rust+SETUP_CPU
 
-rust-cpu-jupyter:
-  FROM +rust-cpu
+rust-jupyter:
+  FROM +rust
   DO jupyter+SETUP
   DO rust+JUPYTER_POST_INSTALL
   SAVE IMAGE --push $REGISTRY/rust-jupyter:$VERSION
