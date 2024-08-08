@@ -12,7 +12,7 @@ ARG --required --global VERSION
 common:
   FROM mambaorg/micromamba:1.5.8
   ENV SHELL=/bin/bash
-  RUN micromamba install -n base -c conda-forge -y htop nvtop
+  RUN micromamba install -n base -c conda-forge -y htop nvtop curl wget unzip
   WORKDIR /workspace
 
 all:
