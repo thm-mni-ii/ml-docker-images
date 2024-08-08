@@ -6,7 +6,7 @@ SETUP:
     RUN micromamba -n base run code-server \
         --install-extension ms-toolsai.jupyter \
         --install-extension equinusocio.vsc-material-theme \
-        --install-extension equinusocio.vsc-material-theme-icons \
-        --install-extension ms-python.python
+        --install-extension equinusocio.vsc-material-theme-icons #\
+#        --install-extension ms-python.python
     COPY frontend/code/jupyter_server_config.py /etc/jupyter/jupyter_server_config.py
     CMD ["jupyter", "server", "--ip=0.0.0.0", "--port=8888"]
