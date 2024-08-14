@@ -12,8 +12,12 @@ ARG --required --global VERSION
 common:
   FROM mambaorg/micromamba:1.5.8
   ENV SHELL=/bin/bash
-  RUN micromamba install -n base -c conda-forge -y htop nvtop curl wget unzip
+  RUN micromamba install -n base -c conda-forge -y htop curl wget unzip
   WORKDIR /workspace
+
+common-cuda:
+  FROM +common
+  RUN micromamba install -n base -c conda-forge -y nvtop
 
 build:
   ARG language
@@ -42,6 +46,19 @@ all-python-cpu:
 all-python-cuda:
   BUILD +build-all-frontends --language=python-cuda
 
+full:
+  FROM +common
+  DO python+SETUP_CPU
+  DO r+SETUP_CPU
+  DO rust+SETUP_CPU
+
+full-jupyter:
+  FROM +full
+  DO jupyter+SETUP
+  DO r+JUPYTER_POST_INSTALL
+  DO rust+JUPYTER_POST_INSTALL
+  SAVE IMAGE --push $REGISTRY/full-jupyter:$VERSION
+
 python-cpu:
   FROM +common
   DO python+SETUP_CPU
@@ -57,7 +74,7 @@ python-cpu-code:
   SAVE IMAGE --push $REGISTRY/python-code:$VERSION
 
 python-cuda:
-  FROM +common
+  FROM +common-cuda
   DO python+SETUP_CUDA
 
 python-cuda-jupyter:
