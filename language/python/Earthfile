@@ -13,7 +13,8 @@ SETUP:
     pandas polars duckdb python-duckdb \
     matplotlib seaborn plotly \
     gradio streamlit \
-    d2l beautifulsoup4 langdetect spacy mastodon.py
+    d2l beautifulsoup4 langdetect spacy mastodon.py \
+    fastai::opencv-python-headless deepface
 
 SETUP_CPU:
     FUNCTION
