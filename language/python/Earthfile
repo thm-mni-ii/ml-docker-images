@@ -14,7 +14,7 @@ SETUP:
     matplotlib seaborn plotly \
     gradio streamlit \
     d2l beautifulsoup4 langdetect spacy mastodon.py \
-    fastai::opencv-python-headless deepface
+    fastai::opencv-python-headless
 
 SETUP_CPU:
     FUNCTION
