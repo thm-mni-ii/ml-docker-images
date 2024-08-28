@@ -2,10 +2,13 @@ VERSION 0.8
 
 SETUP:
     FUNCTION
+    ARG NAMESPACE=base
+    ARG VERSION=3.11
+    ARG ADDITIONAL_PACKAGES
     ARG COMPUTE_SPECIFIC_CHANNELS
     ARG COMPUTE_SPECIFIC_PACKAGES
-    RUN micromamba install -n base -c pytorch -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y \
-    python pytorch torchvision torchaudio $COMPUTE_SPECIFIC_PACKAGES \
+    RUN micromamba install -n $NAMESPACE -c pytorch -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y \
+    python=$VERSION pytorch torchvision torchaudio $COMPUTE_SPECIFIC_PACKAGES \
     lightning torchinfo tensorboard tensorboardx \
     transformers diffusers datasets accelerate evaluate optimum \
     sentence-transformers einops \
@@ -14,12 +17,20 @@ SETUP:
     matplotlib seaborn plotly \
     gradio streamlit \
     d2l beautifulsoup4 langdetect spacy mastodon.py \
-    fastai::opencv-python-headless
+    fastai::opencv-python-headless \
+    $ADDITIONAL_PACKAGES
 
 SETUP_CPU:
     FUNCTION
-    DO +SETUP --COMPUTE_SPECIFIC_PACKAGES="cpuonly"
+    DO +SETUP --VERSION=3.11 --COMPUTE_SPECIFIC_PACKAGES="cpuonly"
+    DO +SETUP_38
 
 SETUP_CUDA:
     FUNCTION
-    DO +SETUP --COMPUTE_SPECIFIC_CHANNELS="-c nvidia" --COMPUTE_SPECIFIC_PACKAGES="pytorch-cuda=12.1"
+    DO +SETUP --VERSION=3.11 --COMPUTE_SPECIFIC_CHANNELS="-c nvidia" --COMPUTE_SPECIFIC_PACKAGES="pytorch-cuda=12.1"
+
+SETUP_38:
+    FUNCTION
+    RUN micromamba create -n python38
+    DO +SETUP --NAMESPACE python38 --VERSION=3.8 --ADDITIONAL_PACKAGES="deepface ipykernel" --COMPUTE_SPECIFIC_PACKAGES="cpuonly"
+    RUN micromamba run -n python38 ipython kernel install --user --name python38 --display-name "Python 3.8 (ipykernel)"
