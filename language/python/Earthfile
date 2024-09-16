@@ -9,6 +9,7 @@ SETUP:
     ARG COMPUTE_SPECIFIC_PACKAGES
     RUN micromamba install -n $NAMESPACE -c pytorch -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y \
     python=$VERSION pytorch torchvision torchaudio $COMPUTE_SPECIFIC_PACKAGES \
+    tensorflow keras \
     lightning torchinfo tensorboard tensorboardx \
     transformers diffusers datasets accelerate evaluate optimum \
     sentence-transformers einops \
@@ -18,6 +19,7 @@ SETUP:
     gradio streamlit \
     d2l beautifulsoup4 langdetect spacy mastodon.py \
     fastai::opencv-python-headless \
+    mlxtend jax \
     $ADDITIONAL_PACKAGES
 
 SETUP_CPU:
