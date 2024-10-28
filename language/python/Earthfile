@@ -20,6 +20,7 @@ SETUP:
     d2l beautifulsoup4 langdetect spacy mastodon.py \
     fastai::opencv-python-headless \
     mlxtend jax \
+    networkx ortools-python \
     $ADDITIONAL_PACKAGES
 
 SETUP_CPU:
