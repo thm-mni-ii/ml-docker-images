@@ -5,6 +5,7 @@ SETUP:
     ARG NAMESPACE=base
     ARG VERSION=3.11
     ARG ADDITIONAL_PACKAGES
+    ARG ADDITIONAL_PIP_PACKAGES
     ARG COMPUTE_SPECIFIC_CHANNELS
     ARG COMPUTE_SPECIFIC_PACKAGES
     RUN micromamba install -n $NAMESPACE -c pytorch -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y \
@@ -22,6 +23,7 @@ SETUP:
     mlxtend jax \
     networkx ortools-python \
     $ADDITIONAL_PACKAGES
+    RUN micromamba run -n $NAMESPACE pip install ipynb $ADDITIONAL_PIP_PACKAGES
 
 SETUP_CPU:
     FUNCTION
