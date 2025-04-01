@@ -15,7 +15,7 @@ SETUP:
     transformers diffusers datasets accelerate evaluate optimum \
     sentence-transformers einops \
     numpy pillow \
-    pandas polars duckdb python-duckdb \
+    pandas geopandas polars duckdb python-duckdb sqlalchemy \
     matplotlib seaborn plotly \
     gradio streamlit \
     d2l beautifulsoup4 langdetect spacy mastodon.py \
