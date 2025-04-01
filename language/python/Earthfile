@@ -21,7 +21,7 @@ SETUP:
     d2l beautifulsoup4 langdetect spacy mastodon.py \
     fastai::opencv-python-headless \
     mlxtend jax \
-    networkx ortools-python \
+    networkx ortools-python xgboost missingno \
     $ADDITIONAL_PACKAGES
     RUN micromamba run -n $NAMESPACE pip install ipynb $ADDITIONAL_PIP_PACKAGES
 
