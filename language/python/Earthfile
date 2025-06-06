@@ -22,8 +22,10 @@ SETUP:
     fastai::opencv-python-headless \
     mlxtend jax \
     networkx ortools-python xgboost missingno \
+    ninja \
     $ADDITIONAL_PACKAGES
     RUN micromamba run -n $NAMESPACE pip install ipynb $ADDITIONAL_PIP_PACKAGES
+    COPY ./language/python/helpers/* /usr/local/bin
 
 SETUP_CPU:
     FUNCTION
