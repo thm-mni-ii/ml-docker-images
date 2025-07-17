@@ -1,0 +1,7 @@
+if [ -f /workspace/.env ]; then
+  export $(grep -v '^#' /workspace/.env | xargs)
+fi
+
+if [ -z ${DISABLE_WELCOME_MESSAGE+x} ]; then
+  glow ~/welcome.md
+fi

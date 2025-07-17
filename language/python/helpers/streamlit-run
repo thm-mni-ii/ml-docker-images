@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# $1 file to watch
+# $2 old md5sum - set to garbage or empty for always reload on save
+checkModification() {
+  if which inotifywait >/dev/null; then
+    while true; do
+      inotifywait -e modify "$1" 2>/dev/null >&2
+      echo "$2" | md5sum -c - 2>/dev/null >&2 || return
+    done
+  fi
+  # fallback to date
+  local last_mod=$(stat -c %Y myfile.txt)
+  while true; do
+    local new_mod=$(stat -c %Y myfile.txt)
+    if [[ "$new_mod" != "$last_mod" ]]; then
+      echo "$2" | md5sum -c - 2>/dev/null >&2 || return
+      last_mod=$new_mod
+    fi
+    sleep 1
+  done
+}
+
+# $1 is ipynb
+# $2 is python target
+copyFile() {
+  while true; do
+    # first get latest execution count
+    latest=$(jq ".cells | max_by(.execution_count).execution_count" "$1")
+    largest_clear=$(jq "[.cells.[] | select(.cell_type == \"code\" and \
+                                            .execution_count and \
+                                            (.source.[] | test(\"^\\\\s*#\\\\s*clear\\\\s*\$\"))) \
+                        ] | max_by(.execution_count).execution_count" "$1")
+    if [ "$latest" == "null" ] || [ -z "$latest" ]; then
+      echo > $2
+    else
+      if [ "$largest_clear" == "null" ] || [ -z "$largest_clear" ]; then
+        largest_clear=0
+      fi
+      # first get all imports
+      jq -r '.cells.[] | select(.cell_type == "code" and .source.[0] and (.source.[0] | startswith("!") | not)) | .source.[] | rtrim' "$1" | perl -e '
+        local $/ = undef;
+        my $text = <STDIN>;
+        my $regex = qr/^import .*|^from.*import[^\n(]*(\([^)]*\))?/mp;
+        while ($text =~ /$regex/g) {
+          print "${^MATCH}\n";
+        }
+      ' | grep -v "streamlit_jupyter" > "$2"
+      # export all keeped or used fiels
+      jq -r ".cells.[] |  \
+             select(.cell_type == \"code\" and \
+                     .source.[0] and \
+                     (.source.[0] | startswith(\"!\") | not) and \
+                     .execution_count and \
+                     (.execution_count == $latest or \
+                       (.execution_count >= $largest_clear and (.source.[] | test(\"^\\\\s*#\\\\s*keep\\\\s*\$\"))) \
+                     ) \
+                   ) | \
+             .source.[] | \
+            rtrim" "$1" >> "$2"
+    fi
+    # check for changes
+    old=$(md5sum "$1")
+    checkModification "$1" "$old"
+  done
+}
+
+# $1 is python file
+startStreamlit() {
+  trigger_count=0
+  streamlit run "$1" | while IFS= read -r line; do
+    if [ $trigger_count -lt 3 ] && [[ "$line" =~ (Local URL|Network URL|External URL).*:([[:digit:]]*) ]]; then
+      if [ "${BASH_REMATCH[1]}" == "Local URL" ]; then
+        echo "  JupyterLab URL: https://jl.mni.thm.de/user/$JUSER/proxy/${BASH_REMATCH[2]}/"
+      fi
+      let "trigger_count=$trigger_count+1"
+    else
+      echo "$line"
+    fi
+  done
+}
+
+askKill() {
+ echo "Process is already running. Either you stop the other process or you kill from here."
+  PS3="What do you want to do? "
+  
+  select option in "Exit" "Kill other process and start Streamlit here"; do
+    case $option in
+      Exit)
+        exit
+        break
+        ;;
+      "Kill other process and start Streamlit here")
+        break
+        ;;
+      *) 
+        echo "Invalid option $REPLY";;
+    esac
+  done
+}
+
+if [ -z "$1" ] || ! [ -f "$1" ] || ! [[ "$1" == *.ipynb ]]; then
+  echo "Usage:"
+  echo "  $0 <jupyterlab-file>"
+  exit
+fi
+
+JUSER=$(echo $JUPYTERHUB_USER)
+PYFILE="/tmp/$JUSER/${1%.ipynb}.py"
+PIDFILE="/tmp/$JUSER/${1%.ipynb}.pid"
+
+rm "$PYFILE" 2>/dev/null >&2
+mkdir -p /tmp/$JUSER
+echo > "$PYFILE"
+
+pid=$(cat "$PIDFILE" 2>/dev/null)
+if [ -n "$pid" ] && [ -d /proc/$pid ]; then
+  askKill
+  kill -INT "-$pid"
+fi
+echo $$ > "$PIDFILE"
+
+copyFile "$1" "$PYFILE" &
+startStreamlit "$PYFILE"

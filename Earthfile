@@ -12,7 +12,9 @@ ARG --required --global VERSION
 common:
   FROM mambaorg/micromamba:2.3.0
   ENV SHELL=/bin/bash
-  RUN micromamba install -n base -c conda-forge -y htop curl wget zip unzip openssh jq inotify-tools git git-lfs screen tmux
+  RUN micromamba install -n base -c conda-forge -y htop curl wget zip unzip openssh jq inotify-tools git git-lfs screen tmux nano glow-md
+  COPY common/.bashrc_extension common/welcome.md ./
+  RUN cat .bashrc_extension >> .bashrc && rm .bashrc_extension
   WORKDIR /workspace
 
 common-cuda:
