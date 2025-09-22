@@ -1,0 +1,13 @@
+VERSION 0.8
+
+common:
+  FROM mambaorg/micromamba:2.3.0
+  ENV SHELL=/bin/bash
+  RUN micromamba install -n base -c conda-forge -y htop curl wget zip unzip openssh jq inotify-tools git git-lfs screen tmux nano glow-md
+  COPY .bashrc_extension welcome.md ./
+  RUN cat .bashrc_extension >> .bashrc && rm .bashrc_extension
+  WORKDIR /workspace
+
+common-cuda:
+  FROM +common
+  RUN micromamba install -n base -c conda-forge -y nvtop

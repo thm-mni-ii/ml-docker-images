@@ -1,5 +1,6 @@
 VERSION 0.8
 
+IMPORT ./common AS common
 IMPORT ./language/python AS python
 IMPORT ./language/r AS r
 IMPORT ./language/rust AS rust
@@ -8,18 +9,6 @@ IMPORT ./frontend/code AS code
 
 ARG --required --global REGISTRY
 ARG --required --global VERSION
-
-common:
-  FROM mambaorg/micromamba:2.3.0
-  ENV SHELL=/bin/bash
-  RUN micromamba install -n base -c conda-forge -y htop curl wget zip unzip openssh jq inotify-tools git git-lfs screen tmux nano glow-md
-  COPY common/.bashrc_extension common/welcome.md ./
-  RUN cat .bashrc_extension >> .bashrc && rm .bashrc_extension
-  WORKDIR /workspace
-
-common-cuda:
-  FROM +common
-  RUN micromamba install -n base -c conda-forge -y nvtop
 
 build:
   ARG language
@@ -49,7 +38,7 @@ all-python-cuda:
   BUILD +build-all-frontends --language=python-cuda
 
 full:
-  FROM +common
+  FROM common+common
   DO python+SETUP_CPU
   DO r+SETUP_CPU
   DO rust+SETUP_CPU
@@ -62,7 +51,7 @@ full-jupyter:
   SAVE IMAGE --push $REGISTRY/full-jupyter:$VERSION
 
 python-cpu:
-  FROM +common
+  FROM common+common
   DO python+SETUP_CPU
 
 python-cpu-jupyter:
@@ -76,7 +65,7 @@ python-cpu-code:
   SAVE IMAGE --push $REGISTRY/python-code:$VERSION
 
 python-cuda:
-  FROM +common-cuda
+  FROM common+common-cuda
   DO python+SETUP_CUDA
 
 python-cuda-jupyter:
@@ -90,7 +79,7 @@ python-cuda-code:
   SAVE IMAGE --push $REGISTRY/python-cuda-code:$VERSION
 
 r:
-  FROM +common
+  FROM common+common
   DO r+SETUP_CPU
 
 r-jupyter:
@@ -100,7 +89,7 @@ r-jupyter:
   SAVE IMAGE --push $REGISTRY/r-jupyter:$VERSION
 
 rust:
-  FROM +common
+  FROM common+common
   DO rust+SETUP_CPU
 
 rust-jupyter:
