@@ -6,8 +6,9 @@ SETUP:
     FUNCTION
     RUN micromamba install -n base -c conda-forge -y jupyterlab jupyterhub-singleuser jupyter-server-proxy ipykernel ipywidgets
     RUN micromamba -n base run jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
-    DO +INSTALL_GDDS_EXTENSION
-    CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888"]
+    COPY frontend/jupyter/update-gdds.sh frontend/jupyter/launch-jupyter-lab.sh /usr/local/bin/
+    RUN update-gdds.sh
+    CMD ["launch-jupyter-lab.sh"]
 
 INSTALL_GDDS_EXTENSION:
     FUNCTION
@@ -15,15 +16,3 @@ INSTALL_GDDS_EXTENSION:
     RUN micromamba -n base run pip install gdds-0.1.0-py3-none-any.whl
     RUN rm gdds-0.1.0-py3-none-any.whl
     RUN micromamba -n base run jupyter labextension enable gdds
-
-build-gdds-extension:
-    FROM common+common
-    RUN micromamba install -n base -c conda-forge -y python python-build hatch nodejs
-    WORKDIR /
-    USER root
-    RUN mkdir /gdds && chown mambauser /gdds
-    USER mambauser
-    RUN --secret GDDS_REPOSITORY_URL micromamba -n base run git clone $GDDS_REPOSITORY_URL gdds
-    WORKDIR /gdds
-    RUN micromamba run -n base python -m build
-    SAVE ARTIFACT dist/gdds-0.1.0-py3-none-any.whl
