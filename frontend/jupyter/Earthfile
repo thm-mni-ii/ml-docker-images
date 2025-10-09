@@ -9,7 +9,7 @@ SETUP:
     COPY frontend/jupyter/update-gdds.sh frontend/jupyter/entrypoint.sh /usr/local/bin/
     RUN update-gdds.sh
     ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
-    CMD ["micromamba", "-n", "base", "run", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888"]
+    CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888"]
 
 INSTALL_GDDS_EXTENSION:
     FUNCTION

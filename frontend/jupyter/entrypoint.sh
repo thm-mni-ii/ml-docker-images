@@ -1,3 +1,3 @@
 #!/bin/bash
 update-gdds.sh
-exec $@
+exec micromamba -n base run $@
