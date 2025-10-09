@@ -40,6 +40,4 @@ jobs:
       id: branch-names
       uses: tj-actions/branch-names@v8
     - name: Run build
-      env:
-        GDDS_REPOSITORY_URL: ${{ secrets.GDDS_REPOSITORY_URL }}
-      run: earthly --secret GDDS_REPOSITORY_URL --ci --push +${{ matrix.image }} --REGISTRY ghcr.io/thm-mni-ii/ml-docker-images --VERSION ${{ github.ref_name }}
+      run: earthly --ci --push +${{ matrix.image }} --REGISTRY ghcr.io/thm-mni-ii/ml-docker-images --VERSION ${{ github.ref_name }}
