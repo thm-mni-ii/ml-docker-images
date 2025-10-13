@@ -10,10 +10,3 @@ SETUP:
     RUN update-gdds.sh
     ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
     CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888"]
-
-INSTALL_GDDS_EXTENSION:
-    FUNCTION
-    COPY +build-gdds-extension/gdds-0.1.0-py3-none-any.whl ./
-    RUN micromamba -n base run pip install gdds-0.1.0-py3-none-any.whl
-    RUN rm gdds-0.1.0-py3-none-any.whl
-    RUN micromamba -n base run jupyter labextension enable gdds

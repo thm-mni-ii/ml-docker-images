@@ -54,6 +54,6 @@ fi
 echo "Installing new gdds artifact..."
 unzip "$ZIP_FILE"
 cd dist
-pip install *.whl
+pip install --force-reinstall *.whl
 cd ..
 rm -r dist
