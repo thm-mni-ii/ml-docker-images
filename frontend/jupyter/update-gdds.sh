@@ -18,7 +18,9 @@ pip() {
 mkdir -p ~/gdds/
 cd ~/gdds/
 
-URL="https://git.thm.de/jhws42/ai-tutor-plugin/-/jobs/artifacts/master/download?job=build_gdds"
+BRANCH="${GDDS_BRANCH:-master}"
+
+URL="https://git.thm.de/jhws42/ai-tutor-plugin/-/jobs/artifacts/$BRANCH/download?job=build_gdds"
 LAST_LOCATION_FILE="last_artifact.txt"
 ZIP_FILE="artifacts.zip"
 
