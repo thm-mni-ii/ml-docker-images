@@ -4,7 +4,7 @@ SETUP:
     FUNCTION
     ARG COMPUTE_SPECIFIC_CHANNELS
     ARG COMPUTE_SPECIFIC_PACKAGES
-    RUN micromamba install -n base -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y r-base r-tidyverse r-amelia r-rpart.plot r-irkernel $COMPUTE_SPECIFIC_PACKAGES
+    RUN micromamba install -n base -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y r-base r-tidyverse r-amelia r-rpart.plot r-irkernel r-factoextra $COMPUTE_SPECIFIC_PACKAGES
 
 SETUP_CPU:
     FUNCTION
