@@ -28,7 +28,7 @@ jobs:
         overprovision-lvm: 'true'
     - uses: earthly/actions-setup@v1
       with:
-        version: v0.8.0
+        version: v0.8.16
     - uses: actions/checkout@v4
     - name: Login to GitHub Packages
       uses: docker/login-action@v1
