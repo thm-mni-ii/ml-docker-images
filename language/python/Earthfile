@@ -11,7 +11,7 @@ SETUP:
     RUN micromamba install -n $NAMESPACE -c pytorch -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y \
     python=$VERSION pytorch torchvision torchaudio $COMPUTE_SPECIFIC_PACKAGES \
     tensorflow keras \
-    lightning torchinfo tensorboard tensorboardx \
+    lightning torchinfo tensorboard tensorboardx mlflow \
     transformers diffusers datasets accelerate evaluate optimum \
     sentence-transformers einops \
     numpy pillow \

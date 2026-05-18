@@ -3,5 +3,5 @@ if [ -f /workspace/.env ]; then
 fi
 
 if [ -z ${DISABLE_WELCOME_MESSAGE+x} ]; then
-  glow ~/welcome.md
+  envsubst < ~/welcome.md | glow -
 fi

@@ -10,7 +10,13 @@ Um Hintergrundprozesse, etwa zum Trainieren von KI-Modellen, zu starten, können
 Streamlit-Programme in `.ipynb` können Sie mit `streamlit-run DATEINAME` ausführen.
 
 # Nutzung von im JupyterLab laufenden HTTP-Diensten
-HTTP-Dienste wie z.B. Tensorboard können verwendet werden, indem der Port, auf dem diese laufen, in folgende URL eingefügt wird: `https://jl.mni.thm.de/proxy/PORT`, z.B. wenn Tensorboard auf dem Standardport gestartet wurde: https://jl.mni.thm.de/proxy/6006.
+HTTP-Dienste wie z.B. MLflow UI können verwendet werden, indem der Port, auf dem diese laufen, in folgende URL eingefügt wird: `https://jl.mni.thm.de/user/${JUPYTERHUB_USER}/proxy/PORT`, z.B. wenn MLflow auf dem Standardport gestartet wurde: https://jl.mni.thm.de/user/${JUPYTERHUB_USER}/proxy/5000/.
+MLflow UI starten Sie mit:
+```bash
+export MLFLOW_SERVER_CORS_ALLOWED_ORIGINS="https://*.mni.thm.de:443"
+export MLFLOW_SERVER_ALLOWED_HOSTS="*.mni.thm.de:*"
+mlflow ui --host 0.0.0.0
+```
 
 # Deaktivieren dieser Nachricht
 Diese Nachricht kann mit dem folgenden Befehl deaktiviert werden:
