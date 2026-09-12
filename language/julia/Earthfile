@@ -1,0 +1,20 @@
+VERSION 0.8
+
+SETUP:
+    FUNCTION
+    ARG COMPUTE_SPECIFIC_PACKAGES
+    RUN micromamba install -n base -c conda-forge $COMPUTE_SPECIFIC_CHANNELS -y julia
+    ENV PATH=$PATH:$HOME/.cargo/bin
+    RUN micromamba -n base run julia -e "import Pkg; Pkg.add([\"DataFrames\", \"Plots\", \"Flux\", \"ProgressMeter\"$COMPUTE_SPECIFIC_PACKAGES])"
+
+SETUP_CPU:
+    FUNCTION
+    DO +SETUP
+
+SETUP_CUDA:
+    FUNCTION
+    DO +SETUP --COMPUTE_SPECIFIC_PACKAGES=", \"CUDA\", \"cuDNN\""
+
+JUPYTER_POST_INSTALL:
+    FUNCTION
+    RUN micromamba -n base run julia -e "delete!(ENV, \"CONDA_JL_CONDA_EXE\"); import Pkg; Pkg.add([\"IJulia\"])"

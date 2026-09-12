@@ -4,6 +4,7 @@ IMPORT ./common AS common
 IMPORT ./language/python AS python
 IMPORT ./language/r AS r
 IMPORT ./language/rust AS rust
+IMPORT ./language/julia AS julia
 IMPORT ./frontend/jupyter AS jupyter
 IMPORT ./frontend/code AS code
 
@@ -20,7 +21,7 @@ build-all-frontends:
   BUILD +build --language=$language --frontend=jupyter #--frontend=code
 
 all:
-  BUILD +build-all-frontends --language=python-cpu --language=python-cuda --language=rust --language=r
+  BUILD +build-all-frontends --language=python-cpu --language=python-cuda --language=rust --language=r --language=julia-cpu --language=julia-gpu
 
 all-python:
   BUILD +build-all-frontends --language=python-cpu --language=python-cuda
@@ -36,6 +37,15 @@ all-python-cpu:
 
 all-python-cuda:
   BUILD +build-all-frontends --language=python-cuda
+
+all-julia:
+  BUILD +build-all-frontends --language=julia-cpu --language=julia-cuda
+
+all-julia-cpu:
+  BUILD +build-all-frontends --language=julia-cpu
+
+all-julia-cuda:
+  BUILD +build-all-frontends --language=julia-cuda
 
 full:
   FROM common+common
@@ -97,3 +107,23 @@ rust-jupyter:
   DO jupyter+SETUP
   DO rust+JUPYTER_POST_INSTALL
   SAVE IMAGE --push $REGISTRY/rust-jupyter:$VERSION
+
+julia-cpu:
+  FROM common+common
+  DO julia+SETUP_CPU
+
+julia-cpu-jupyter:
+  FROM +julia-cpu
+  DO jupyter+SETUP
+  DO julia+JUPYTER_POST_INSTALL
+  SAVE IMAGE --push $REGISTRY/julia-jupyter:$VERSION
+
+julia-cuda:
+  FROM common+common
+  DO julia+SETUP_CUDA
+
+julia-cuda-jupyter:
+  FROM +julia-cuda
+  DO jupyter+SETUP
+  DO julia+JUPYTER_POST_INSTALL
+  SAVE IMAGE --push $REGISTRY/julia-cuda-jupyter:$VERSION
