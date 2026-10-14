@@ -6,10 +6,16 @@ on:
     tags: [ '*' ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [gdds-artifact-updated]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         image: [all-python-cpu, all-python-cuda, all-r, all-rust, all-julia-cpu, all-julia-cuda, full-jupyter]
@@ -30,6 +36,104 @@ jobs:
       with:
         version: v0.8.16
     - uses: actions/checkout@v4
+    - name: Generate token from GitHub App
+      id: app-token
+      continue-on-error: true
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.GDDS_APP_ID }}
+        private-key: ${{ secrets.GDDS_APP_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+    - name: Create plugins staging directory
+      run: mkdir -p ./plugins
+    - name: Download GdDS extension artifact from gdds
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GDDS_REPO_TOKEN || secrets.GITHUB_TOKEN }}
+        SOURCE_REPO: ${{ vars.GDDS_REPO || 'thm-mni-ii/gdds-ai-tutor' }}
+        AUTH_METHOD: ${{ steps.app-token.outputs.token != '' && 'GitHub App' || (secrets.GDDS_REPO_TOKEN != '' && 'GDDS_REPO_TOKEN' || 'Default GITHUB_TOKEN') }}
+      run: |
+        set -euo pipefail
+
+        echo "Authentication method: $AUTH_METHOD"
+        if [ "$AUTH_METHOD" = "Default GITHUB_TOKEN" ]; then
+          echo "::warning::Neither GitHub App credentials (GDDS_APP_ID / GDDS_APP_PRIVATE_KEY) nor GDDS_REPO_TOKEN are set. Default GITHUB_TOKEN will likely fail if $SOURCE_REPO is private."
+        fi
+
+        # Determine the Run ID to download:
+        # 1. If triggered via repository_dispatch from gdds, use the passed run_id:
+        RUN_ID="${{ github.event.client_payload.run_id }}"
+
+        # 2. Otherwise, dynamically find the latest successful run:
+        if [ -z "$RUN_ID" ]; then
+          echo "Searching for latest successful run in $SOURCE_REPO..."
+
+          # Strategy A: Query by workflow name "ai-tutor-plugin CI" on main
+          RUN_ID=$(gh run list \
+            --repo "$SOURCE_REPO" \
+            --workflow "ai-tutor-plugin CI" \
+            --branch main \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId // empty' 2>/dev/null || true)
+        fi
+
+        if [ -z "$RUN_ID" ]; then
+          # Strategy B: Query by workflow file "ai-tutor-plugin.yml" on main
+          RUN_ID=$(gh run list \
+            --repo "$SOURCE_REPO" \
+            --workflow "ai-tutor-plugin.yml" \
+            --branch main \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId // empty' 2>/dev/null || true)
+        fi
+
+        if [ -z "$RUN_ID" ]; then
+          # Strategy C: Query recent successful runs without --workflow filter
+          RUN_ID=$(gh run list \
+            --repo "$SOURCE_REPO" \
+            --branch main \
+            --status success \
+            --limit 10 \
+            --json databaseId,workflowName \
+            --jq 'map(select(.workflowName | test("ai-tutor"; "i"))) | .[0].databaseId // empty' 2>/dev/null || true)
+        fi
+
+        if [ -z "$RUN_ID" ]; then
+          # Strategy D: Any recent successful run matching ai-tutor across branches
+          RUN_ID=$(gh run list \
+            --repo "$SOURCE_REPO" \
+            --status success \
+            --limit 10 \
+            --json databaseId,workflowName \
+            --jq 'map(select(.workflowName | test("ai-tutor"; "i"))) | .[0].databaseId // empty' 2>/dev/null || true)
+        fi
+
+        if [ -n "$RUN_ID" ] && [ "$RUN_ID" != "null" ]; then
+          echo "Downloading artifact from run ID: $RUN_ID in $SOURCE_REPO..."
+          gh run download "$RUN_ID" \
+            --repo "$SOURCE_REPO" \
+            --name ai-tutor-plugin-dist \
+            --dir ./plugins
+        else
+          echo "Specific run ID not resolved; attempting direct download of latest 'ai-tutor-plugin-dist' artifact from $SOURCE_REPO..."
+          gh run download \
+            --repo "$SOURCE_REPO" \
+            --name ai-tutor-plugin-dist \
+            --dir ./plugins
+        fi
+
+        echo "Downloaded files in ./plugins:"
+        ls -la ./plugins/
+
+        # Confirm that at least one .whl file is present
+        count=$(ls -1 ./plugins/*.whl 2>/dev/null | wc -l)
+        if [ "$count" -eq 0 ]; then
+          echo "Error: No .whl file found in downloaded artifact."
+          exit 1
+        fi
     - name: Login to GitHub Packages
       uses: docker/login-action@v1
       with:

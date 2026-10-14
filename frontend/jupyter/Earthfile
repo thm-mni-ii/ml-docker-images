@@ -6,7 +6,11 @@ SETUP:
     FUNCTION
     RUN micromamba install -n base -c conda-forge -y jupyterlab jupyterhub-singleuser jupyter-server-proxy ipykernel ipywidgets
     RUN micromamba -n base run jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
-    COPY frontend/jupyter/update-gdds.sh frontend/jupyter/entrypoint.sh /usr/local/bin/
-    #RUN update-gdds.sh
+    COPY plugins/*.whl /tmp/plugins/
+    RUN micromamba -n base run pip install --no-cache-dir /tmp/plugins/*.whl \
+        && rm -rf /tmp/plugins
+    RUN micromamba -n base run jupyter server extension list 2>&1 | grep -i "GdDS.*OK" \
+        && micromamba -n base run jupyter labextension list 2>&1 | grep -i "GdDS.*OK"
+    COPY frontend/jupyter/entrypoint.sh /usr/local/bin/
     ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
     CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888"]
